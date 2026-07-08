@@ -22,7 +22,7 @@ const els = {
   offlineBlock: $('offlineBlock'), retryBtn: $('retryBtn'), userBtn: $('userBtn'), refreshBtn: $('refreshBtn'),
   connectionText: $('connectionText'), mapWrap: $('mapWrap'), savedPin: $('savedPin'), draftPin: $('draftPin'),
   timeText: $('timeText'), savedByText: $('savedByText'), carNameText: $('carNameText'), memoInput: $('memoInput'),
-  saveBtn: $('saveBtn'), deleteBtn: $('deleteBtn'), gpsBtn: $('gpsBtn'), toast: $('toast')
+  saveBtn: $('saveBtn'), deleteBtn: $('deleteBtn'), gpsBtn: $('gpsBtn'), toast: $('toast'), mapHint: $('mapHint')
 };
 
 function toast(message) {
@@ -39,6 +39,7 @@ function setOnlineUI() {
   els.offlineBlock.classList.toggle('hidden', !blocked);
   els.connectionText.textContent = blocked ? '온라인 공유 모드 준비 중' : '온라인 공유 연결됨';
   els.saveBtn.disabled = blocked || !draftPoint;
+  if (els.mapHint) els.mapHint.classList.toggle('ready', !!draftPoint && !blocked);
   els.deleteBtn.disabled = blocked;
 }
 
@@ -55,6 +56,7 @@ function selectCar(carKey) {
   document.querySelectorAll('.car-card').forEach(btn => btn.classList.toggle('active', btn.dataset.car === carKey));
   els.carNameText.textContent = cars[carKey].name;
   els.draftPin.classList.add('hidden');
+  if (els.mapHint) els.mapHint.textContent = '지도를 터치해서 주차 위치를 선택하세요.';
   renderCurrentCar();
 }
 
@@ -109,6 +111,7 @@ function mapClick(e) {
   draftPoint = { x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) };
   placePin(els.draftPin, draftPoint);
   els.saveBtn.disabled = false;
+  if (els.mapHint) els.mapHint.textContent = '선택한 위치가 맞으면 아래 저장 버튼을 누르세요.';
 }
 
 async function saveLocation() {
@@ -128,7 +131,8 @@ async function saveLocation() {
     }, { merge: true });
     draftPoint = null;
     els.draftPin.classList.add('hidden');
-    toast('주차 위치를 저장했습니다.');
+    toast(`${cars[selectedCar].name} 위치를 저장했습니다.`);
+    if (els.mapHint) els.mapHint.textContent = '지도를 터치해서 주차 위치를 선택하세요.';
   } catch (err) {
     console.error(err);
     toast('저장 실패: Firestore 설정을 확인하세요.');

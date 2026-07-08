@@ -30,11 +30,11 @@
     <section class="car-tabs" aria-label="차량 선택">
       <button class="car-card active" data-car="prius" type="button">
         <img src="./assets/prius.svg" alt="토요타 프리우스 4세대 쥐색" />
-        <div><strong>우스</strong></div>
+        <div><span class="selected-badge">현재 선택</span><strong>우스</strong></div>
       </button>
       <button class="car-card" data-car="morning" type="button">
         <img src="./assets/morning.svg" alt="회색 경차" />
-        <div><strong>모닝</strong></div>
+        <div><span class="selected-badge">현재 선택</span><strong>모닝</strong></div>
       </button>
     </section>
 
@@ -44,7 +44,7 @@
         <div id="savedPin" class="pin saved hidden" aria-label="저장된 위치"></div>
         <div id="draftPin" class="pin draft hidden" aria-label="선택한 위치"></div>
       </div>
-      <p class="hint">지도를 터치해서 주차 위치를 선택하세요.</p>
+      <p class="hint" id="mapHint">지도를 터치해서 주차 위치를 선택하세요.</p>
     </section>
 
     <section class="info-card">

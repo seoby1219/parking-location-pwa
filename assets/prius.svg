@@ -1,13 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 180">
-  <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#20242a"/><stop offset=".55" stop-color="#5b626d"/><stop offset="1" stop-color="#2f343b"/></linearGradient></defs>
-  <rect width="360" height="180" fill="none"/>
-  <ellipse cx="180" cy="150" rx="138" ry="14" fill="#000" opacity=".12"/>
-  <path d="M48 111 C66 76 109 59 171 57 C232 55 279 74 311 105 C326 108 334 118 333 132 L318 136 L61 136 C44 133 36 125 40 116 Z" fill="url(#g)"/>
-  <path d="M112 68 C142 50 208 49 245 70 C235 78 205 86 154 86 C132 86 119 80 112 68 Z" fill="#cfd6de" opacity=".75"/>
-  <path d="M248 72 C271 80 292 95 305 107 L250 107 C248 96 247 83 248 72 Z" fill="#d7dde4" opacity=".7"/>
-  <path d="M90 104 L306 104" stroke="#1b1f25" stroke-width="4" opacity=".35"/>
-  <circle cx="100" cy="135" r="26" fill="#17191d"/><circle cx="100" cy="135" r="13" fill="#c7cbd0"/>
-  <circle cx="272" cy="135" r="26" fill="#17191d"/><circle cx="272" cy="135" r="13" fill="#c7cbd0"/>
-  <path d="M47 114 C58 110 69 110 80 114" stroke="#f3f6f9" stroke-width="6" stroke-linecap="round" opacity=".9"/>
-  <path d="M309 109 C320 111 326 115 329 122" stroke="#ff3b30" stroke-width="5" stroke-linecap="round" opacity=".8"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 150" role="img" aria-label="토요타 프리우스 4세대 쥐색">
+<defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#29313b"/><stop offset=".55" stop-color="#5b6570"/><stop offset="1" stop-color="#252b32"/></linearGradient><filter id="s" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="7" stdDeviation="7" flood-color="#0f172a" flood-opacity=".22"/></filter></defs>
+<ellipse cx="180" cy="132" rx="145" ry="13" fill="#d9e2ec" opacity=".85"/>
+<g filter="url(#s)">
+<path d="M43 92 C62 58 102 44 151 40 C201 36 252 49 307 77 C324 85 331 97 325 110 L42 110 C36 104 37 98 43 92Z" fill="url(#g)"/>
+<path d="M92 72 C116 49 151 43 193 47 C223 50 249 61 270 77 L94 77 Z" fill="#cfd8e3" opacity=".96"/>
+<path d="M99 73 C122 53 154 49 184 51 L180 77 L98 77 Z" fill="#9aa9b8" opacity=".9"/>
+<path d="M190 51 C222 55 245 63 263 77 L188 77 Z" fill="#b7c3cf" opacity=".92"/>
+<path d="M44 94 C111 103 221 100 323 91 C328 97 329 105 325 110 L42 110 C36 103 37 98 44 94Z" fill="#20262e" opacity=".45"/>
+<circle cx="103" cy="112" r="24" fill="#111827"/><circle cx="103" cy="112" r="12" fill="#e5e7eb"/><circle cx="270" cy="112" r="24" fill="#111827"/><circle cx="270" cy="112" r="12" fill="#e5e7eb"/>
+<path d="M314 83 C327 88 333 95 331 103 L306 100 Z" fill="#ef4444"/><path d="M42 93 L63 89 L59 99 L37 102 Z" fill="#f8fafc" opacity=".9"/>
+</g></svg>
