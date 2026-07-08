@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>우리집 주차위치</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="offlineBlock" class="offline-block hidden">
+    <div class="offline-card">
+      <div class="offline-icon">!</div>
+      <h2>온라인 연결이 필요합니다</h2>
+      <p>정확한 공유를 위해 인터넷과 Firebase 연결이 되었을 때만 주차 위치를 저장하고 확인할 수 있습니다.</p>
+      <button id="retryBtn" type="button">다시 연결 확인</button>
+    </div>
+  </div>
+
+  <main class="app-shell">
+    <header class="topbar">
+      <button id="userBtn" class="pill-btn" type="button">남편</button>
+      <div>
+        <h1>우리집 주차위치</h1>
+        <p id="connectionText">Firebase 연결 확인 중</p>
+      </div>
+      <button id="refreshBtn" class="icon-btn" type="button" aria-label="새로고침">↻</button>
+    </header>
+
+    <section class="car-tabs" aria-label="차량 선택">
+      <button class="car-card active" data-car="prius" type="button">
+        <img src="./assets/prius.svg" alt="토요타 프리우스 4세대 쥐색" />
+        <div><strong>우스</strong></div>
+      </button>
+      <button class="car-card" data-car="morning" type="button">
+        <img src="./assets/morning.svg" alt="회색 경차" />
+        <div><strong>모닝</strong></div>
+      </button>
+    </section>
+
+    <section class="map-section">
+      <div class="map-wrap" id="mapWrap">
+        <img id="parkingMap" src="./assets/parking-map.png" alt="대올골 주차장 지도" draggable="false" />
+        <div id="savedPin" class="pin saved hidden" aria-label="저장된 위치"></div>
+        <div id="draftPin" class="pin draft hidden" aria-label="선택한 위치"></div>
+      </div>
+      <p class="hint">지도를 터치해서 주차 위치를 선택하세요.</p>
+    </section>
+
+    <section class="info-card">
+      <div class="status-line">
+        <span>주차 위치 안내</span>
+        <strong id="timeText">저장된 위치가 없습니다.</strong>
+      </div>
+      <div class="meta-grid">
+        <div><span>저장자</span><strong id="savedByText">-</strong></div>
+        <div><span>차량</span><strong id="carNameText">우스</strong></div>
+      </div>
+      <label class="memo-label" for="memoInput">메모 <span>(선택사항)</span></label>
+      <input id="memoInput" type="text" placeholder="메모 없어도 저장됩니다." maxlength="40" />
+      <button id="saveBtn" class="primary-btn" type="button" disabled>선택한 위치 저장</button>
+    </section>
+
+    <section class="bottom-actions">
+      <button id="deleteBtn" class="danger-btn" type="button">위치 삭제</button>
+      <button id="gpsBtn" class="ghost-btn" type="button">내 위치 보기</button>
+    </section>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+  <script type="module" src="./app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js'));
+    }
+  </script>
+</body>
+</html>
