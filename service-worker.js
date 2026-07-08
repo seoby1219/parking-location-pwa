@@ -1,4 +1,4 @@
-const CACHE_NAME = 'parking-location-pwa-v4-5';
+const CACHE_NAME = 'parking-location-pwa-v4-8';
 const ASSETS = [
   './',
   './index.html',
@@ -6,9 +6,9 @@ const ASSETS = [
   './app.js',
   './firebase-config.js',
   './manifest.webmanifest',
-  './assets/parking-map.png',
-  './assets/prius.svg',
-  './assets/morning.svg'
+  './assets/parking-map.jpg',
+  './assets/prius.jpg',
+  './assets/morning.png'
 ];
 
 self.addEventListener('install', (event) => {

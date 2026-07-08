@@ -22,7 +22,7 @@ const els = {
   offlineBlock: $('offlineBlock'), retryBtn: $('retryBtn'), userBtn: $('userBtn'), refreshBtn: $('refreshBtn'),
   connectionText: $('connectionText'), mapWrap: $('mapWrap'), savedPin: $('savedPin'), draftPin: $('draftPin'),
   timeText: $('timeText'), memoInput: $('memoInput'),
-  saveBtn: $('saveBtn'), deleteBtn: $('deleteBtn'), gpsBtn: $('gpsBtn'), toast: $('toast'), mapHint: $('mapHint')
+  saveBtn: $('saveBtn'), deleteBtn: $('deleteBtn'), toast: $('toast'), mapHint: $('mapHint')
 };
 
 function toast(message) {
@@ -70,9 +70,9 @@ function placePin(pinEl, point) {
 }
 
 function formatParkingTime(value, savedBy = '-') {
-  if (!value) return '저장된 위치가 없습니다.';
+  if (!value) return { text: '저장된 위치가 없습니다.', fresh: false, empty: true };
   const d = value.toDate ? value.toDate() : new Date(value);
-  if (Number.isNaN(d.getTime())) return '저장된 위치가 있습니다.';
+  if (Number.isNaN(d.getTime())) return { text: '저장된 위치가 있습니다.', fresh: false, empty: false };
   const now = new Date();
   const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const startTarget = new Date(d.getFullYear(), d.getMonth(), d.getDate());
@@ -80,21 +80,26 @@ function formatParkingTime(value, savedBy = '-') {
   const hh = String(d.getHours()).padStart(2, '0');
   const mm = String(d.getMinutes()).padStart(2, '0');
   const by = savedBy && savedBy !== '-' ? savedBy : '저장자';
-  if (diffDays === 0) return `오늘 ${hh}:${mm} | ${by} 저장`;
-  if (diffDays === 1) return `어제 ${hh}:${mm} | ${by} 저장`;
-  return `${diffDays}일 전 ${hh}:${mm} | ${by} 저장`;
+  if (diffDays === 0) return { text: `오늘 ${hh}:${mm} | ${by} 저장`, fresh: true, empty: false };
+  if (diffDays === 1) return { text: `어제 ${hh}:${mm} | ${by} 저장`, fresh: false, empty: false };
+  return { text: `${diffDays}일 전 ${hh}:${mm} | ${by} 저장`, fresh: false, empty: false };
 }
 
 function renderCurrentCar() {
   const data = carData[selectedCar];
   if (!data) {
     els.timeText.textContent = '저장된 위치가 없습니다.';
+    els.timeText.classList.remove('today', 'old');
+    els.timeText.classList.add('empty');
     els.memoInput.value = '';
     placePin(els.savedPin, null);
     setOnlineUI();
     return;
   }
-  els.timeText.textContent = formatParkingTime(data.updatedAt || data.savedAt, data.savedBy);
+  const formatted = formatParkingTime(data.updatedAt || data.savedAt, data.savedBy);
+  els.timeText.textContent = formatted.text;
+  els.timeText.classList.remove('today', 'old', 'empty');
+  els.timeText.classList.add(formatted.empty ? 'empty' : (formatted.fresh ? 'today' : 'old'));
   els.memoInput.value = data.memo || '';
   placePin(els.savedPin, data);
   setOnlineUI();
@@ -148,15 +153,6 @@ async function deleteLocation() {
   }
 }
 
-function showGps() {
-  if (!navigator.geolocation) { toast('현재 위치 기능을 사용할 수 없습니다.'); return; }
-  navigator.geolocation.getCurrentPosition(
-    () => toast('현재 위치 확인됨. 지도 위 직접 위치와 비교하세요.'),
-    () => toast('현재 위치 권한이 필요합니다.'),
-    { enableHighAccuracy: true, timeout: 6000 }
-  );
-}
-
 function initFirebase() {
   try {
     const app = initializeApp(firebaseConfig);
@@ -188,7 +184,6 @@ els.refreshBtn.addEventListener('click', () => location.reload());
 els.mapWrap.addEventListener('click', mapClick);
 els.saveBtn.addEventListener('click', saveLocation);
 els.deleteBtn.addEventListener('click', deleteLocation);
-els.gpsBtn.addEventListener('click', showGps);
 document.querySelectorAll('.car-card').forEach(btn => btn.addEventListener('click', () => selectCar(btn.dataset.car)));
 window.addEventListener('online', setOnlineUI);
 window.addEventListener('offline', setOnlineUI);
