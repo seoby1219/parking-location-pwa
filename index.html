@@ -29,12 +29,12 @@
 
     <section class="car-tabs" aria-label="차량 선택">
       <button class="car-card active" data-car="prius" type="button">
-        <img src="./assets/prius.svg" alt="토요타 프리우스 4세대 쥐색" />
-        <div><span class="selected-badge">현재 선택</span><strong>우스</strong></div>
+        <img src="./assets/prius.jpg" alt="우스" />
+        <strong>우스</strong>
       </button>
       <button class="car-card" data-car="morning" type="button">
-        <img src="./assets/morning.svg" alt="회색 경차" />
-        <div><span class="selected-badge">현재 선택</span><strong>모닝</strong></div>
+        <img src="./assets/morning.png" alt="모닝" />
+        <strong>모닝</strong>
       </button>
     </section>
 
@@ -48,17 +48,11 @@
     </section>
 
     <section class="info-card">
-      <div class="status-line">
-        <span>주차 위치 안내</span>
+      <div class="status-line compact-status">
         <strong id="timeText">저장된 위치가 없습니다.</strong>
       </div>
-      <div class="meta-grid">
-        <div><span>저장자</span><strong id="savedByText">-</strong></div>
-        <div><span>차량</span><strong id="carNameText">우스</strong></div>
-      </div>
-      <label class="memo-label" for="memoInput">메모 <span>(선택사항)</span></label>
-      <input id="memoInput" type="text" placeholder="메모 없어도 저장됩니다." maxlength="40" />
-      <button id="saveBtn" class="primary-btn" type="button" disabled>현재 위치 저장</button>
+      <input id="memoInput" type="text" placeholder="메모를 입력하세요(선택)" maxlength="40" />
+      <button id="saveBtn" class="primary-btn" type="button" disabled>선택한 위치 저장</button>
     </section>
 
     <section class="bottom-actions">

@@ -21,7 +21,7 @@ const $ = (id) => document.getElementById(id);
 const els = {
   offlineBlock: $('offlineBlock'), retryBtn: $('retryBtn'), userBtn: $('userBtn'), refreshBtn: $('refreshBtn'),
   connectionText: $('connectionText'), mapWrap: $('mapWrap'), savedPin: $('savedPin'), draftPin: $('draftPin'),
-  timeText: $('timeText'), savedByText: $('savedByText'), carNameText: $('carNameText'), memoInput: $('memoInput'),
+  timeText: $('timeText'), memoInput: $('memoInput'),
   saveBtn: $('saveBtn'), deleteBtn: $('deleteBtn'), gpsBtn: $('gpsBtn'), toast: $('toast'), mapHint: $('mapHint')
 };
 
@@ -54,7 +54,6 @@ function selectCar(carKey) {
   selectedCar = carKey;
   draftPoint = null;
   document.querySelectorAll('.car-card').forEach(btn => btn.classList.toggle('active', btn.dataset.car === carKey));
-  els.carNameText.textContent = cars[carKey].name;
   els.draftPin.classList.add('hidden');
   if (els.mapHint) els.mapHint.textContent = '지도를 터치해서 주차 위치를 선택하세요.';
   renderCurrentCar();
@@ -70,7 +69,7 @@ function placePin(pinEl, point) {
   pinEl.classList.remove('hidden');
 }
 
-function formatParkingTime(value) {
+function formatParkingTime(value, savedBy = '-') {
   if (!value) return '저장된 위치가 없습니다.';
   const d = value.toDate ? value.toDate() : new Date(value);
   if (Number.isNaN(d.getTime())) return '저장된 위치가 있습니다.';
@@ -80,24 +79,22 @@ function formatParkingTime(value) {
   const diffDays = Math.floor((startToday - startTarget) / 86400000);
   const hh = String(d.getHours()).padStart(2, '0');
   const mm = String(d.getMinutes()).padStart(2, '0');
-  if (diffDays === 0) return `오늘 ${hh}:${mm}에 주차된 위치입니다.`;
-  if (diffDays === 1) return `어제 ${hh}:${mm}에 주차된 위치입니다.`;
-  return `${diffDays}일 전 ${hh}:${mm}에 주차된 위치입니다.`;
+  const by = savedBy && savedBy !== '-' ? savedBy : '저장자';
+  if (diffDays === 0) return `오늘 ${hh}:${mm} | ${by} 저장`;
+  if (diffDays === 1) return `어제 ${hh}:${mm} | ${by} 저장`;
+  return `${diffDays}일 전 ${hh}:${mm} | ${by} 저장`;
 }
 
 function renderCurrentCar() {
   const data = carData[selectedCar];
-  els.carNameText.textContent = cars[selectedCar].name;
   if (!data) {
     els.timeText.textContent = '저장된 위치가 없습니다.';
-    els.savedByText.textContent = '-';
     els.memoInput.value = '';
     placePin(els.savedPin, null);
     setOnlineUI();
     return;
   }
-  els.timeText.textContent = formatParkingTime(data.updatedAt || data.savedAt);
-  els.savedByText.textContent = data.savedBy || '-';
+  els.timeText.textContent = formatParkingTime(data.updatedAt || data.savedAt, data.savedBy);
   els.memoInput.value = data.memo || '';
   placePin(els.savedPin, data);
   setOnlineUI();
