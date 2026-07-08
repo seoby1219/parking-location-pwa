@@ -1,22 +1,35 @@
-# Parking Location PWA V4.3
+# 우리집 주차위치 PWA V4.4
 
-우리집 주차위치 PWA입니다.
+## 반영 내용
+- Firebase Firestore 실시간 연결
+- 저장 경로: `parking/daeolgol/cars/us`, `parking/daeolgol/cars/morning`
+- 지도 터치 위치 저장
+- 우스/모닝 차량별 독립 저장
+- 남편/와이프 저장자 전환
+- 오늘/어제/N일 전 시간 표시
+- 온라인 연결 상태에서만 저장 및 확인 가능
 
-## Firebase 연결
-Firestore 경로:
+## GitHub Pages 업로드
+저장소 루트에 모든 파일과 폴더를 업로드하세요.
 
-```text
-parking / daeolgol / cars / us
-parking / daeolgol / cars / morning
+필수 구조:
+```
+index.html
+styles.css
+app.js
+firebase-config.js
+manifest.webmanifest
+service-worker.js
+assets/
+  parking-map.png
+  prius.svg
+  morning.svg
 ```
 
-## GitHub Pages 배포
-Settings > Pages > Branch: main / root 선택 후 Save.
-
-## 사용 방법
-1. 우스 또는 모닝 선택
-2. 지도 터치
-3. 메모 선택 입력
-4. 선택한 위치 저장
-
-인터넷과 Firebase 연결이 되어야 저장/확인이 가능합니다.
+## 테스트 방법
+1. GitHub Pages 주소 접속
+2. 우스 선택
+3. 지도 위 위치 터치
+4. 현재 위치 저장 클릭
+5. Firebase Firestore에서 `parking > daeolgol > cars > us` 문서 생성 확인
+6. 다른 기기에서 같은 주소 접속 후 위치가 표시되는지 확인
