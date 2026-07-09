@@ -4,11 +4,11 @@ import {
   getFirestore, doc, onSnapshot, setDoc, deleteDoc, serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
 
-const cars = {
+const DEFAULT_CARS = {
   prius: { name: '우스', docId: 'us' },
   morning: { name: '모닝', docId: 'morning' }
 };
-
+let cars = loadCars();
 let db;
 let selectedCar = 'prius';
 let selectedUser = localStorage.getItem('parkingUser') || '남편';
@@ -20,9 +20,13 @@ let unsubscribe = [];
 const $ = (id) => document.getElementById(id);
 const els = {
   offlineBlock: $('offlineBlock'), retryBtn: $('retryBtn'), userBtn: $('userBtn'), refreshBtn: $('refreshBtn'),
-  connectionText: $('connectionText'), mapWrap: $('mapWrap'), savedPin: $('savedPin'), draftPin: $('draftPin'),
-  timeText: $('timeText'), memoInput: $('memoInput'),
-  saveBtn: $('saveBtn'), deleteBtn: $('deleteBtn'), toast: $('toast'), mapHint: $('mapHint')
+  connectionText: $('connectionText'), mapWrap: $('mapWrap'), parkingMap: $('parkingMap'), savedPin: $('savedPin'), draftPin: $('draftPin'),
+  timeText: $('timeText'), memoInput: $('memoInput'), saveBtn: $('saveBtn'), deleteBtn: $('deleteBtn'), toast: $('toast'), mapHint: $('mapHint'),
+  settingsBtn: $('settingsBtn'), settingsSheet: $('settingsSheet'), closeSettingsBtn: $('closeSettingsBtn'),
+  priusNameLabel: $('priusNameLabel'), morningNameLabel: $('morningNameLabel'), priusImg: $('priusImg'), morningImg: $('morningImg'),
+  priusNameInput: $('priusNameInput'), morningNameInput: $('morningNameInput'), saveCarNamesBtn: $('saveCarNamesBtn'),
+  priusPhotoInput: $('priusPhotoInput'), morningPhotoInput: $('morningPhotoInput'), mapImageInput: $('mapImageInput'),
+  themeBtn: $('themeBtn'), pinSizeInput: $('pinSizeInput'), firebaseStatusText: $('firebaseStatusText'), resetSettingsBtn: $('resetSettingsBtn')
 };
 
 function toast(message) {
@@ -32,15 +36,21 @@ function toast(message) {
   window.__toastTimer = setTimeout(() => els.toast.classList.add('hidden'), 1800);
 }
 
+function loadCars() {
+  try { return { ...DEFAULT_CARS, ...(JSON.parse(localStorage.getItem('parkingCars') || '{}')) }; }
+  catch { return { ...DEFAULT_CARS }; }
+}
+function saveCars() { localStorage.setItem('parkingCars', JSON.stringify(cars)); }
 function isOnlineReady() { return navigator.onLine && firebaseReady; }
 
 function setOnlineUI() {
   const blocked = !isOnlineReady();
   els.offlineBlock.classList.toggle('hidden', !blocked);
-  els.connectionText.textContent = blocked ? '온라인 공유 모드 준비 중' : '온라인 공유 연결됨';
+  els.connectionText.textContent = blocked ? '온라인 공유 모드 준비 중' : '🟢 연결됨';
   els.saveBtn.disabled = blocked || !draftPoint;
   if (els.mapHint) els.mapHint.classList.toggle('ready', !!draftPoint && !blocked);
   els.deleteBtn.disabled = blocked;
+  els.firebaseStatusText.textContent = blocked ? 'Firebase 연결 대기 중' : 'Firebase 연결 정상';
 }
 
 function switchUser() {
@@ -48,6 +58,13 @@ function switchUser() {
   localStorage.setItem('parkingUser', selectedUser);
   els.userBtn.textContent = selectedUser;
   toast(`${selectedUser} 모드로 변경`);
+}
+
+function updateCarLabels() {
+  els.priusNameLabel.textContent = cars.prius.name;
+  els.morningNameLabel.textContent = cars.morning.name;
+  els.priusNameInput.value = cars.prius.name;
+  els.morningNameInput.value = cars.morning.name;
 }
 
 function selectCar(carKey) {
@@ -80,9 +97,9 @@ function formatParkingTime(value, savedBy = '-') {
   const hh = String(d.getHours()).padStart(2, '0');
   const mm = String(d.getMinutes()).padStart(2, '0');
   const by = savedBy && savedBy !== '-' ? savedBy : '저장자';
-  if (diffDays === 0) return { text: `오늘 ${hh}:${mm} | ${by} 저장`, fresh: true, empty: false };
-  if (diffDays === 1) return { text: `어제 ${hh}:${mm} | ${by} 저장`, fresh: false, empty: false };
-  return { text: `${diffDays}일 전 ${hh}:${mm} | ${by} 저장`, fresh: false, empty: false };
+  if (diffDays === 0) return { text: `🟢 오늘 ${hh}:${mm} · ${by}가 저장`, fresh: true, empty: false };
+  if (diffDays === 1) return { text: `🔴 어제 ${hh}:${mm} · ${by}가 저장`, fresh: false, empty: false };
+  return { text: `🔴 ${diffDays}일 전 ${hh}:${mm} · ${by}가 저장`, fresh: false, empty: false };
 }
 
 function renderCurrentCar() {
@@ -153,6 +170,70 @@ async function deleteLocation() {
   }
 }
 
+function openSettings() { els.settingsSheet.classList.remove('hidden'); }
+function closeSettings() { els.settingsSheet.classList.add('hidden'); }
+
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function handleImageSetting(input, storageKey, imgEl, message) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const dataUrl = await readFileAsDataUrl(file);
+  localStorage.setItem(storageKey, dataUrl);
+  imgEl.src = dataUrl;
+  toast(message);
+  input.value = '';
+}
+
+function applyStoredSettings() {
+  updateCarLabels();
+  const priusPhoto = localStorage.getItem('parkingPriusPhoto');
+  const morningPhoto = localStorage.getItem('parkingMorningPhoto');
+  const mapImage = localStorage.getItem('parkingMapImage');
+  const theme = localStorage.getItem('parkingTheme') || 'light';
+  const pinSize = localStorage.getItem('parkingPinSize') || '46';
+  if (priusPhoto) els.priusImg.src = priusPhoto;
+  if (morningPhoto) els.morningImg.src = morningPhoto;
+  if (mapImage) els.parkingMap.src = mapImage;
+  document.body.classList.toggle('dark', theme === 'dark');
+  document.documentElement.style.setProperty('--pin-size', `${pinSize}px`);
+  els.pinSizeInput.value = pinSize;
+}
+
+function saveCarNames() {
+  cars.prius.name = els.priusNameInput.value.trim() || DEFAULT_CARS.prius.name;
+  cars.morning.name = els.morningNameInput.value.trim() || DEFAULT_CARS.morning.name;
+  saveCars();
+  updateCarLabels();
+  renderCurrentCar();
+  toast('차량 이름을 저장했습니다.');
+}
+
+function toggleTheme() {
+  const next = document.body.classList.contains('dark') ? 'light' : 'dark';
+  localStorage.setItem('parkingTheme', next);
+  applyStoredSettings();
+}
+
+function resetSettings() {
+  if (!confirm('차량 이름, 사진, 지도, 테마 설정을 초기화할까요?')) return;
+  ['parkingCars','parkingPriusPhoto','parkingMorningPhoto','parkingMapImage','parkingTheme','parkingPinSize'].forEach(k => localStorage.removeItem(k));
+  cars = loadCars();
+  els.priusImg.src = './assets/prius.jpg';
+  els.morningImg.src = './assets/morning.png';
+  els.parkingMap.src = './assets/parking-map.jpg';
+  applyStoredSettings();
+  renderCurrentCar();
+  toast('설정을 초기화했습니다.');
+}
+
 function initFirebase() {
   try {
     const app = initializeApp(firebaseConfig);
@@ -187,7 +268,22 @@ els.deleteBtn.addEventListener('click', deleteLocation);
 document.querySelectorAll('.car-card').forEach(btn => btn.addEventListener('click', () => selectCar(btn.dataset.car)));
 window.addEventListener('online', setOnlineUI);
 window.addEventListener('offline', setOnlineUI);
+els.settingsBtn.addEventListener('click', openSettings);
+els.closeSettingsBtn.addEventListener('click', closeSettings);
+els.settingsSheet.addEventListener('click', (e) => { if (e.target === els.settingsSheet) closeSettings(); });
+els.saveCarNamesBtn.addEventListener('click', saveCarNames);
+els.priusPhotoInput.addEventListener('change', () => handleImageSetting(els.priusPhotoInput, 'parkingPriusPhoto', els.priusImg, '우스 사진을 변경했습니다.'));
+els.morningPhotoInput.addEventListener('change', () => handleImageSetting(els.morningPhotoInput, 'parkingMorningPhoto', els.morningImg, '모닝 사진을 변경했습니다.'));
+els.mapImageInput.addEventListener('change', () => handleImageSetting(els.mapImageInput, 'parkingMapImage', els.parkingMap, '지도를 변경했습니다.'));
+els.themeBtn.addEventListener('click', toggleTheme);
+els.pinSizeInput.addEventListener('input', () => {
+  const size = els.pinSizeInput.value;
+  localStorage.setItem('parkingPinSize', size);
+  document.documentElement.style.setProperty('--pin-size', `${size}px`);
+});
+els.resetSettingsBtn.addEventListener('click', resetSettings);
 
+applyStoredSettings();
 renderCurrentCar();
 setOnlineUI();
 initFirebase();
