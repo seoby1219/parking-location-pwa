@@ -1,4 +1,4 @@
-const CACHE_NAME = 'parking-location-pwa-v4-8';
+const CACHE_NAME = 'parking-location-pwa-v5-final-candidate-1';
 const ASSETS = [
   './',
   './index.html',
